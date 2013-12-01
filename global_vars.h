@@ -10,7 +10,9 @@
 
 #include <string>
 
-static std::string DRIVE_FILENAME = "WHALE.TXT";
+static std::string DRIVE_FILENAME = "fdd.flp";
+static std::string EMPTY_DRIVE_FILENAME = "blankfdd.flp";
+static std::string BOOT_RECORD_FILENAME = "boot.bin";
 
 static const unsigned int SECTOR_SIZE_IN_BYTES = 512;
 static const unsigned int ROOT_DIR_SIZE_IN_SECTORS = 14;

@@ -68,6 +68,7 @@ private:
 	void init_volume ();
 	void read_drive ();
 	void add_sector_data_from_buf(char buf[]);
+	void write_boot_record(std::ofstream &out_stream);
 
 public:
 	unsigned long DRIVE_LENGTH;
