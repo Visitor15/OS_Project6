@@ -10,7 +10,7 @@
 
 #include <string>
 
-static std::string DRIVE_FILENAME = "fdd.flp";
+static std::string DRIVE_FILENAME = "WHALE.TXT";
 
 static const unsigned int SECTOR_SIZE_IN_BYTES = 512;
 static const unsigned int ROOT_DIR_SIZE_IN_SECTORS = 14;

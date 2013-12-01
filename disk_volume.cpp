@@ -31,18 +31,21 @@ void disk_volume::init_volume() {
 void disk_volume::read_drive() {
 	std::ifstream i_stream (DRIVE_FILENAME.c_str(), std::ios::in | std::ios::binary);
 
-	i_stream.seekg(0, std::ios::end);
+	i_stream.seekg(0, i_stream.end);
 	DRIVE_LENGTH = i_stream.tellg();
-
+	i_stream.seekg(0, i_stream.beg);
 	if(i_stream.is_open()) {
 		curr_index = 0;
 		while(i_stream.good()) {
+			memset(buffer, '0', SECTOR_SIZE_IN_BYTES);
 			// Reading file a sector length at a time.
-			i_stream.getline(buffer, SECTOR_SIZE_IN_BYTES);
+			i_stream.read(buffer, SECTOR_SIZE_IN_BYTES);
 			// Adding data to DRIVE_ARRAY.
 			add_sector_data_from_buf(buffer);
 			// Adding FAT entry.
 			F_ALLOC_TABLE.add_sector_entry();
+
+			std::cout << buffer << std::endl;
 		}
 	}
 }
