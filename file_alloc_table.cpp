@@ -7,17 +7,27 @@
 
 #include "file_alloc_table.h"
 
-file_alloc_table::file_alloc_table (const int num_vol_sectors) {
-	init(num_vol_sectors);
+file_alloc_table::file_alloc_table () {
+	init(0);
+}
+
+file_alloc_table::file_alloc_table (const int num_drive_sectors) {
+	init(num_drive_sectors);
 }
 
 file_alloc_table::~file_alloc_table () {
 
 }
 
-void file_alloc_table::init (const int num_vol_sectors) {
-	for (int i = 0; i < num_vol_sectors; i++) {
-		FILE_ALLOCATION_TABLE[i] = fat_entry_t();
+void file_alloc_table::init (const int num_drive_sectors) {
+	sector_count = num_drive_sectors;
+	for (unsigned int i = 0; i < sector_count; i++) {
+		FILE_ALLOCATION_TABLE.push_back(fat_entry_t());
 	}
+}
+
+void file_alloc_table::add_sector_entry () {
+	FILE_ALLOCATION_TABLE.push_back(fat_entry_t());
+	++sector_count;
 }
 

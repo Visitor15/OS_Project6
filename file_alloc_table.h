@@ -8,11 +8,11 @@
 #ifndef FILE_ALLOC_TABLE_H_
 #define FILE_ALLOC_TABLE_H_
 
+#include <vector>
+
 enum FAT_ENTRY_VALUE {
 	FREE_SECTOR	= 0x000,
-	NOT_ALLOWED = 0x0001 | 0x0002,
 	BAD_SECTOR	= 0xFFF7,
-	EOF			= 0xFFF8
 };
 
 // 12 bit file allocation table entry.
@@ -24,14 +24,27 @@ struct fat_entry_t {
 
 class file_alloc_table {
 private:
-	fat_entry_t* FILE_ALLOCATION_TABLE;
+	std::vector<fat_entry_t> FILE_ALLOCATION_TABLE;
 
-	void init(const int num_vol_sectors);
+	unsigned long sector_count;
+
+	void init(const int num_drive_sectors);
 public:
-	file_alloc_table (const int num_vol_sectors);
+	/*
+	 *	CONSTRUCTORS
+	 */
+	file_alloc_table ();
+	file_alloc_table (const int num_drive_sectors);
+
+	/*
+	 * 	DESTRUCTOR
+	 */
 	virtual ~file_alloc_table ();
 
-
+	/*
+	 *	FUNCTION
+	 */
+	void add_sector_entry();
 };
 
 #endif /* FILE_ALLOC_TABLE_H_ */

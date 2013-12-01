@@ -7,7 +7,7 @@ directory_table.o : directory_table.cpp directory_table.h global_vars.h
 	g++ -c -Wall directory_table.cpp
 
 file_alloc_table.o : file_alloc_table.cpp file_alloc_table.h
-	g++ -c -Wall file_all_table.cpp
+	g++ -c -Wall file_alloc_table.cpp
 
 disk_volume.o : disk_volume.cpp disk_volume.h file_alloc_table.h directory_table.h global_vars.h
 	g++ -c -Wall disk_volume.cpp
