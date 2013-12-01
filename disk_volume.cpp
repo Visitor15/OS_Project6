@@ -33,11 +33,13 @@ void disk_volume::read_drive() {
 			std::ios::in | std::ios::binary);
 
 	if (!i_stream.is_open()) {
+		i_stream.close();
 		std::ofstream o_stream(DRIVE_FILENAME.c_str());
 		write_boot_record(o_stream);
+		i_stream.open(DRIVE_FILENAME.c_str(), std::ios::in | std::ios::binary);
 	}
 
-	i_stream.open(DRIVE_FILENAME.c_str(), std::ios::in | std::ios::binary);
+
 
 	i_stream.seekg(0, i_stream.end);
 	DRIVE_LENGTH = i_stream.tellg();
