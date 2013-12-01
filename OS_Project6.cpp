@@ -27,7 +27,7 @@ int main(void) {
 		std::cout << data_list.at(i).sector_data << std::endl;
 	}
 
-//	disk_volume::get_instance()->print_drive_contents();
+	disk_volume::get_instance()->print_drive_contents();
 
 	return EXIT_SUCCESS;
 }

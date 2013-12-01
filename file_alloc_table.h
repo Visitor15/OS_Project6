@@ -89,7 +89,7 @@ public:
 	/*
 	 *	FUNCTION
 	 */
-	void get_sectors_for_file(uint16_t starting_cluster, int num_sectors, fat_entry_t* entry_list);
+	void get_sectors_for_file(uint16_t starting_cluster, int num_sectors, std::vector<fat_entry_t> &entry_list);
 
 };
 

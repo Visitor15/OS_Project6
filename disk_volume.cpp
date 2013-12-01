@@ -166,7 +166,7 @@ void disk_volume::copy_file_to_drive(std::string file_name) {
 
 		if (sectors > 0) {
 			// We saved the head of the file sector to the last free sector entry.
-			long curr_index = sectors[sectors_required - 1].entry;
+			long curr_index = sectors[sectors_required].entry;
 			head_sector = curr_index;
 			sectors[sectors_required - 1].entry = END_OF_FILE;
 
@@ -209,7 +209,9 @@ directory_entry_t disk_volume::create_dir_entry(std::string file_name,
 	dir_entry.starting_cluster = head_sector;
 
 	memcpy(dir_entry.name, title.c_str(), 8);
-	memcpy(dir_entry.extension, extension.c_str(), 43);
+	memcpy(dir_entry.extension, extension.c_str(), 4);
+
+	i_stream.close();
 
 	return dir_entry;
 }
@@ -220,9 +222,9 @@ std::vector<drive_sector_t> disk_volume::get_file_by_name(
 	directory_entry_t* dir_entry = DIR_TABLE.get_entry_by_name(file_name);
 	if (dir_entry > 0) {
 		unsigned long num_sectors = ceil(
-				dir_entry->size / (double) SECTOR_SIZE_IN_BYTES);
-		fat_entry_t fat_entry_list[num_sectors];
-		F_ALLOC_TABLE.get_sectors_for_file(dir_entry->starting_cluster,
+				(*dir_entry).size / (double) SECTOR_SIZE_IN_BYTES);
+		std::vector<fat_entry_t> fat_entry_list (num_sectors);
+		F_ALLOC_TABLE.get_sectors_for_file((*dir_entry).starting_cluster,
 				num_sectors, fat_entry_list);
 
 		for (int i = 0; i < num_sectors; i++) {
@@ -240,7 +242,7 @@ void disk_volume::print_drive_contents() {
 
 	std::ofstream o_stream("test_1.txt", std::ios::binary);
 	long length = DRIVE_ARRAY.size();
-	for (int i = 0; i < DRIVE_ARRAY.size(); i++) {
+	for (int i = 33; i < DRIVE_ARRAY.size(); i++) {
 		std::string data = DRIVE_ARRAY.at(i).sector_data;
 //		std::cout << data << std::endl;
 //		std::cout << "=============================" << std::endl;
