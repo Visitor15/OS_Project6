@@ -25,21 +25,7 @@ struct boot_ctrl_blk {
 	// 512 bytes
 };
 
-struct drive_sector_t {
-	char sector_data[SECTOR_SIZE_IN_BYTES];
 
-	drive_sector_t() {
-		// Do nothing
-	}
-
-	drive_sector_t(char data[]) {
-		memcpy(sector_data, data, SECTOR_SIZE_IN_BYTES);
-	}
-
-	void copy_data(char data[]) {
-		memcpy(sector_data, data, SECTOR_SIZE_IN_BYTES);
-	}
-};
 
 struct volume_t {
 
@@ -75,6 +61,7 @@ private:
 	void add_sector_data_from_buf(char buf[]);
 	void write_boot_record(std::ofstream &out_stream);
 	void write_primary_fat(std::vector<fat_entry_t> alloc_table);
+	directory_entry_t create_dir_entry(std::string file_name, long head_sector);
 
 	drive_sector_t* get_data_sector_at(long index);
 
@@ -84,6 +71,7 @@ public:
 	static disk_volume* get_instance ();
 
 	void copy_file_to_drive(std::string file_name);
+	std::vector<drive_sector_t> get_file_by_name (std::string file_name);
 	void print_drive_contents();
 };
 

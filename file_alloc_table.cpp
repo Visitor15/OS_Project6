@@ -72,3 +72,11 @@ fat_entry_t* file_alloc_table::get_sector_at(long index) {
 	return &FILE_ALLOCATION_TABLE[index];
 }
 
+void file_alloc_table::get_sectors_for_file(uint16_t starting_cluster,
+		int num_sectors, fat_entry_t* entry_list) {
+	entry_list[0] = FILE_ALLOCATION_TABLE[starting_cluster];
+	for (int i = 1; i < num_sectors; i++) {
+		entry_list[i] = FILE_ALLOCATION_TABLE[entry_list[i - 1].entry];
+	}
+}
+

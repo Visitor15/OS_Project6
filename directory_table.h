@@ -48,7 +48,10 @@ public:
 	bool delete_entry_at(const unsigned int index);
 	bool rename_entry_at(const char old_name[], const char new_name[]);
 
+
+
 	directory_entry_t* get_entry_at(const unsigned int index);
+	directory_entry_t* get_entry_by_name(const std::string file_name);
 
 	void list_contents();
 };

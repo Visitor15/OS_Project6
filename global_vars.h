@@ -9,6 +9,7 @@
 #define GLOBAL_VARS_H_
 
 #include <string>
+#include <time.h>
 
 static std::string DRIVE_FILENAME = "fdd.flp";
 static std::string EMPTY_DRIVE_FILENAME = "blankfdd.flp";
@@ -31,5 +32,9 @@ enum FILE_ATTRS {
 	SUB_DIRECTORY	= 0x10,
 	ARCHIVE			= 0x20,
 };
+
+static time_t get_current_time() {
+	return time(0);
+}
 
 #endif /* GLOBAL_VARS_H_ */
