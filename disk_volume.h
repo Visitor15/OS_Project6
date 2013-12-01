@@ -9,17 +9,14 @@
 #define DISK_VOLUME_H_
 
 #include <stdlib.h>
+#include <stdint.h>
+
+#include "global_vars.h"
+#include "file_alloc_table.h"
+#include "directory_table.h"
 
 struct boot_ctrl_blk {
-
-};
-
-struct file_t {
-
-};
-
-struct directory_entry {
-
+	// 512 bytes
 };
 
 struct volume_t {
@@ -28,15 +25,13 @@ struct volume_t {
 
 class disk_volume {
 private:
-	disk_volume();
-	disk_volume(disk_volume const&);
-
-	static disk_volume* m_pInstance;
+	disk_volume() {};
+	disk_volume(disk_volume const&) {};
 
 public:
 	static disk_volume* get_instance();
 };
 
-
+static disk_volume* m_pInstance;
 
 #endif /* DISK_VOLUME_H_ */

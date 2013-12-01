@@ -7,7 +7,7 @@
 
 #include "disk_volume.h"
 
-static disk_volume* disk_volume::get_instance () {
+disk_volume* disk_volume::get_instance () {
 
 	if(m_pInstance == NULL) {
 		static disk_volume _self;
