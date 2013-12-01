@@ -11,16 +11,16 @@
 #include <vector>
 
 enum FAT_ENTRY_VALUE {
-	FREE_SECTOR	= 0x000,
-	BAD_SECTOR	= 0xFFF7,
+	FREE_SECTOR	= 0x00,
+	BAD_SECTOR	= 0xFF7,
 };
 
 // 12 bit file allocation table entry.
-struct fat_entry_t {
+struct __attribute__((packed)) fat_entry_t {
 	unsigned int entry : 12;
 
-	fat_entry_t() : entry(FREE_SECTOR) {};
-} __attribute__((packed));
+	fat_entry_t() : entry(BAD_SECTOR) {};
+};
 
 class file_alloc_table {
 private:
@@ -45,6 +45,11 @@ public:
 	 *	FUNCTION
 	 */
 	void add_sector_entry();
+
+	/*
+	 * 	FUNCTION
+	 */
+	std::vector<fat_entry_t> get_allocation_table();
 };
 
 #endif /* FILE_ALLOC_TABLE_H_ */

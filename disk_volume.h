@@ -69,6 +69,7 @@ private:
 	void read_drive ();
 	void add_sector_data_from_buf(char buf[]);
 	void write_boot_record(std::ofstream &out_stream);
+	void write_primary_fat(std::vector<fat_entry_t> alloc_table);
 
 public:
 	unsigned long DRIVE_LENGTH;

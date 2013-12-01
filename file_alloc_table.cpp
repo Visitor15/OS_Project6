@@ -31,3 +31,7 @@ void file_alloc_table::add_sector_entry () {
 	++sector_count;
 }
 
+std::vector<fat_entry_t> file_alloc_table::get_allocation_table() {
+	return FILE_ALLOCATION_TABLE;
+}
+
