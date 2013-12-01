@@ -7,6 +7,8 @@
 
 #include "disk_volume.h"
 
+#include <string>
+
 disk_volume::disk_volume() {
 	init_volume();
 }
@@ -61,10 +63,11 @@ void disk_volume::read_drive() {
 			}
 		}
 
+		(*F_ALLOC_TABLE.get_sector_at(0)).entry = RESERVED;
 		i_stream.close();
 	}
 
-	write_primary_fat(F_ALLOC_TABLE.get_allocation_table());
+//	write_primary_fat(F_ALLOC_TABLE.get_allocation_table());
 }
 
 void disk_volume::add_sector_data_from_buf(char buf[]) {
@@ -98,6 +101,8 @@ void disk_volume::write_boot_record(std::ofstream &out_stream) {
 		// Skipping the first 512 bytes since we've already written to that sector.
 		i_stream.seekg(SECTOR_SIZE_IN_BYTES);
 
+		fat_entry_t* fat_entry = F_ALLOC_TABLE.get_sector_at(0);
+
 		while (i_stream.good()) {
 			memset(buffer, 0, SECTOR_SIZE_IN_BYTES);
 			// Reading file a sector length at a time.
@@ -113,7 +118,6 @@ void disk_volume::write_boot_record(std::ofstream &out_stream) {
 	}
 }
 
-
 // COMPLETE ME!
 void disk_volume::write_primary_fat(std::vector<fat_entry_t> alloc_table) {
 	std::ofstream o_stream(DRIVE_FILENAME.c_str(), std::ios::binary);
@@ -121,14 +125,14 @@ void disk_volume::write_primary_fat(std::vector<fat_entry_t> alloc_table) {
 	o_stream.seekp(SECTOR_SIZE_IN_BYTES);
 
 	struct double_entry_container {
-		unsigned int : 24;
+		unsigned int :24;
 	};
 
 	// 3 byte (24-bit) char[] to neatly pack 2 12-bit FAT entries.
 	char buf[3];
 	double length = 0;
-	for(int i = 1; i < alloc_table.size(); i++) {
-		memset(buf, 0, sizeof(buf) );
+	for (int i = 1; i < alloc_table.size(); i++) {
+		memset(buf, 0, sizeof(buf));
 
 		fat_entry_t entries[2];
 		entries[0] = alloc_table.at(i - 1);
@@ -137,6 +141,75 @@ void disk_volume::write_primary_fat(std::vector<fat_entry_t> alloc_table) {
 		length = (double) sizeof(entries);
 
 		o_stream.write((char*) container, 3);
+
 	}
+
+	o_stream.close();
+}
+
+void disk_volume::copy_file_to_drive(std::string file_name) {
+	std::ifstream i_stream(file_name.c_str(), std::ios::in | std::ios::binary);
+
+	if (i_stream.is_open()) {
+		memset(buffer, 0, SECTOR_SIZE_IN_BYTES);
+
+		i_stream.seekg(0, i_stream.end);
+		double file_length = i_stream.tellg();
+		i_stream.seekg(0, i_stream.beg);
+
+		//Calculating number of sectors required for writing file
+		int sectors_required = ceil(file_length / SECTOR_SIZE_IN_BYTES);
+
+		fat_entry_t* sectors = F_ALLOC_TABLE.request_specified_free_sectors(
+				sectors_required);
+
+		if (sectors > 0) {
+			// We saved the head of the file sector to the last free sector entry.
+			long curr_index = sectors[sectors_required - 1].entry;
+			sectors[sectors_required - 1].entry = END_OF_FILE;
+
+			for (int i = 0; i < sectors_required; i++) {
+				if (i_stream.good()) {
+					//We've enough allocated to save the file.
+					memset(buffer, 0, SECTOR_SIZE_IN_BYTES);
+					// Reading file a sector length at a time.
+					i_stream.read(buffer, SECTOR_SIZE_IN_BYTES);
+
+					// Ensuring we have something to write.
+					if (i_stream.gcount() > 0) {
+						get_data_sector_at(curr_index)->copy_data(buffer);
+					}
+					curr_index = sectors[i].entry;
+				}
+			}
+		}
+
+		i_stream.close();
+	}
+}
+
+void disk_volume::print_drive_contents() {
+	std::cout << "==========================================" << std::endl;
+	std::cout << "| PRINTING DRIVE CONTENT" << std::endl;
+	std::cout << "==========================================" << std::endl;
+
+	std::ofstream o_stream("test_1.txt", std::ios::binary);
+	long length = DRIVE_ARRAY.size();
+	for(int i = 0; i < DRIVE_ARRAY.size(); i++) {
+		std::string data = DRIVE_ARRAY.at(i).sector_data;
+//		std::cout << data << std::endl;
+//		std::cout << "=============================" << std::endl;
+
+
+
+		o_stream.write(DRIVE_ARRAY.at(i).sector_data, SECTOR_SIZE_IN_BYTES);
+	}
+
+	o_stream.flush();
+	o_stream.close();
+}
+
+drive_sector_t* disk_volume::get_data_sector_at(long index) {
+	return &DRIVE_ARRAY[index];
 }
 

@@ -14,6 +14,11 @@ static std::string DRIVE_FILENAME = "fdd.flp";
 static std::string EMPTY_DRIVE_FILENAME = "blankfdd.flp";
 static std::string BOOT_RECORD_FILENAME = "boot.bin";
 
+static std::string TEST_FILENAME = "WHALE.TXT";
+static std::string TEST_FILENAME_2 = "EMILY.TXT";
+
+static int DATA_SEG_OFFSET = 33;
+
 static const unsigned int SECTOR_SIZE_IN_BYTES = 512;
 static const unsigned int ROOT_DIR_SIZE_IN_SECTORS = 14;
 static const unsigned int DIR_ENTRY_SIZE_IN_BYTES = 32;

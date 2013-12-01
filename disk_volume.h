@@ -15,6 +15,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <fstream>
+#include <math.h>
 
 #include "global_vars.h"
 #include "file_alloc_table.h"
@@ -32,6 +33,10 @@ struct drive_sector_t {
 	}
 
 	drive_sector_t(char data[]) {
+		memcpy(sector_data, data, SECTOR_SIZE_IN_BYTES);
+	}
+
+	void copy_data(char data[]) {
 		memcpy(sector_data, data, SECTOR_SIZE_IN_BYTES);
 	}
 };
@@ -71,10 +76,15 @@ private:
 	void write_boot_record(std::ofstream &out_stream);
 	void write_primary_fat(std::vector<fat_entry_t> alloc_table);
 
+	drive_sector_t* get_data_sector_at(long index);
+
 public:
 	unsigned long DRIVE_LENGTH;
 
 	static disk_volume* get_instance ();
+
+	void copy_file_to_drive(std::string file_name);
+	void print_drive_contents();
 };
 
 static disk_volume* m_pInstance;

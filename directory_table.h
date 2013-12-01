@@ -9,6 +9,7 @@
 #define DIRECTORY_TABLE_H_
 
 #include <stdint.h>
+#include <vector>
 #include "global_vars.h"
 
 /*
@@ -36,8 +37,9 @@ struct directory_entry_t {
 class directory_table {
 private:
 	// Array of 'directory_entry_t' structs representing the directory table of the volume.
-	directory_entry_t DIRECTORY[(ROOT_DIR_SIZE_IN_SECTORS * SECTOR_SIZE_IN_BYTES) / DIR_ENTRY_SIZE_IN_BYTES];
+//	directory_entry_t DIRECTORY[(ROOT_DIR_SIZE_IN_SECTORS * SECTOR_SIZE_IN_BYTES) / DIR_ENTRY_SIZE_IN_BYTES];
 
+	std::vector<directory_entry_t> DIRECTORY;
 public:
 	directory_table();
 	virtual ~directory_table();

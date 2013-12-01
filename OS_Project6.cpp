@@ -16,5 +16,10 @@ int main(void) {
 
 	disk_volume::get_instance();
 
+	disk_volume::get_instance()->copy_file_to_drive(TEST_FILENAME);
+	disk_volume::get_instance()->copy_file_to_drive(TEST_FILENAME_2);
+
+	disk_volume::get_instance()->print_drive_contents();
+
 	return EXIT_SUCCESS;
 }
