@@ -58,7 +58,7 @@ private:
 	 */
 	void init_volume ();
 	void read_drive ();
-	void add_sector_data_from_buf(char buf[]);
+	void add_sector_data_from_buf(char buf[], long length);
 	void write_boot_record(std::ofstream &out_stream);
 	void write_primary_fat(std::vector<fat_entry_t> alloc_table);
 	directory_entry_t create_dir_entry(std::string file_name, long head_sector);
@@ -72,6 +72,7 @@ public:
 
 	void copy_file_to_drive(std::string file_name);
 	std::vector<drive_sector_t> get_file_by_name (std::string file_name);
+	void print_file(std::string file_name);
 	void print_drive_contents();
 };
 

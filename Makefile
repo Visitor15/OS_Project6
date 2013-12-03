@@ -16,4 +16,4 @@ OS_Project6.o : OS_Project6.cpp
 	g++ -c -g OS_Project6.cpp
 
 clean :
-	rm -f $(objects) log*.txt test*.txt core
+	rm -f $(objects) log*.txt test*.txt TEST*.txt core

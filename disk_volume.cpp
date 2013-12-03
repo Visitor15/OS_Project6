@@ -57,7 +57,7 @@ void disk_volume::read_drive() {
 			// Ensuring we read something.
 			if (i_stream.gcount() > 0) {
 				// Adding data to DRIVE_ARRAY.
-				add_sector_data_from_buf(buffer);
+				add_sector_data_from_buf(buffer, i_stream.gcount());
 				// Adding FAT entry.
 				F_ALLOC_TABLE.add_sector_entry();
 			}
@@ -70,8 +70,8 @@ void disk_volume::read_drive() {
 //	write_primary_fat(F_ALLOC_TABLE.get_allocation_table());
 }
 
-void disk_volume::add_sector_data_from_buf(char buf[]) {
-	DRIVE_ARRAY.push_back(drive_sector_t(buf));
+void disk_volume::add_sector_data_from_buf(char buf[], long length) {
+	DRIVE_ARRAY.push_back(drive_sector_t(buf, length));
 	++curr_index;
 }
 
@@ -149,7 +149,7 @@ void disk_volume::write_primary_fat(std::vector<fat_entry_t> alloc_table) {
 
 void disk_volume::copy_file_to_drive(std::string file_name) {
 	std::ifstream i_stream(file_name.c_str(), std::ios::in | std::ios::binary);
-	long head_sector = -1;
+	unsigned int head_sector = -1;
 	if (i_stream.is_open()) {
 		memset(buffer, 0, SECTOR_SIZE_IN_BYTES);
 
@@ -161,14 +161,25 @@ void disk_volume::copy_file_to_drive(std::string file_name) {
 		int sectors_required = ceil(
 				(double) file_length / (double) SECTOR_SIZE_IN_BYTES);
 
-		fat_entry_t* sectors = F_ALLOC_TABLE.request_specified_free_sectors(
+		std::vector<fat_entry_t*> data_list;
+
+		F_ALLOC_TABLE.request_specified_free_sectors(data_list,
 				sectors_required);
 
-		if (sectors > 0) {
+		for(int z = 0; z < data_list.size(); z++) {
+			std::cout << "DATA LINK: " << data_list.at(z)->entry << std::endl;
+		}
+
+		std::cout << "DATA LIST SIZE: " << data_list.size() << std::endl;
+
+		if (data_list.size() > 0) {
 			// We saved the head of the file sector to the last free sector entry.
-			long curr_index = sectors[sectors_required].entry;
+			long curr_index = data_list.at(data_list.size() - 1)->entry;
 			head_sector = curr_index;
-			sectors[sectors_required - 1].entry = END_OF_FILE;
+
+			std::cout << "Got head index: " << head_sector << std::endl;
+
+			data_list.at(data_list.size() - 1)->entry = END_OF_FILE;
 
 			for (int i = 0; i < sectors_required; i++) {
 				if (i_stream.good()) {
@@ -176,11 +187,14 @@ void disk_volume::copy_file_to_drive(std::string file_name) {
 					// Reading file a sector length at a time.
 					i_stream.read(buffer, SECTOR_SIZE_IN_BYTES);
 
+//					std::cout << "READ IN: " << buffer << std::endl;
+
 					// Ensuring we have something to write.
 					if (i_stream.gcount() > 0) {
-						get_data_sector_at(curr_index)->copy_data(buffer);
+						get_data_sector_at(curr_index)->copy_data(buffer,
+								i_stream.gcount());
 					}
-					curr_index = sectors[i].entry;
+					curr_index = data_list.at(i)->entry;
 				}
 			}
 		}
@@ -208,6 +222,9 @@ directory_entry_t disk_volume::create_dir_entry(std::string file_name,
 
 	dir_entry.starting_cluster = head_sector;
 
+	std::cout << "Head sector set to: " << dir_entry.starting_cluster
+			<< std::endl;
+
 	memcpy(dir_entry.name, title.c_str(), 8);
 	memcpy(dir_entry.extension, extension.c_str(), 4);
 
@@ -223,12 +240,26 @@ std::vector<drive_sector_t> disk_volume::get_file_by_name(
 	if (dir_entry > 0) {
 		unsigned long num_sectors = ceil(
 				(*dir_entry).size / (double) SECTOR_SIZE_IN_BYTES);
-		std::vector<fat_entry_t> fat_entry_list (num_sectors);
-		F_ALLOC_TABLE.get_sectors_for_file((*dir_entry).starting_cluster,
+		std::vector<fat_entry_t> fat_entry_list;
+
+		std::cout << "NUM SECTORS NEEDED FOR ENTER: " << dir_entry->starting_cluster
+				<< " - " << num_sectors << std::endl;
+		fat_entry_list.push_back(*F_ALLOC_TABLE.get_sector_at(dir_entry->starting_cluster));
+
+		F_ALLOC_TABLE.get_sectors_for_file(dir_entry->starting_cluster,
 				num_sectors, fat_entry_list);
 
+		std::cout << "STARTING SECTOR: " << dir_entry->starting_cluster << std::endl;
+
+
+		file_sectors.push_back((DRIVE_ARRAY[dir_entry->starting_cluster]));
+
+		std::cout << "Found starting sector: " << fat_entry_list.size() << std::endl;
 		for (int i = 0; i < num_sectors; i++) {
-			file_sectors.push_back(DRIVE_ARRAY[fat_entry_list[i].entry]);
+			std::cout << "HIT WITH ENTRY: " << fat_entry_list.at(i).entry << std::endl;
+
+			file_sectors.push_back(DRIVE_ARRAY[fat_entry_list.at(i).entry]);
+			std::cout << "RETRIEVED DATA AT INDEX: " << fat_entry_list.at(i).entry << " - " << file_sectors.at(file_sectors.size() - 1).sector_data << std::endl;
 		}
 	}
 
@@ -236,19 +267,47 @@ std::vector<drive_sector_t> disk_volume::get_file_by_name(
 }
 
 void disk_volume::print_drive_contents() {
+//	std::cout << "==========================================" << std::endl;
+//	std::cout << "| PRINTING DRIVE CONTENT" << std::endl;
+//	std::cout << "==========================================" << std::endl;
+//
+//	std::ofstream o_stream("test_1.txt", std::ios::binary);
+//	long length = DRIVE_ARRAY.size();
+//	for (int i = 33; i < DRIVE_ARRAY.size(); i++) {
+//		std::string data = DRIVE_ARRAY.at(i).sector_data;
+////		std::cout << data << std::endl;
+////		std::cout << "=============================" << std::endl;
+//
+//		o_stream.write(DRIVE_ARRAY.at(i).sector_data, SECTOR_SIZE_IN_BYTES);
+//	}
+//
+//	o_stream.flush();
+//	o_stream.close();
+}
+
+void disk_volume::print_file(std::string file_name) {
+	std::vector<drive_sector_t> data_list = get_file_by_name(file_name);
+
 	std::cout << "==========================================" << std::endl;
 	std::cout << "| PRINTING DRIVE CONTENT" << std::endl;
 	std::cout << "==========================================" << std::endl;
 
-	std::ofstream o_stream("test_1.txt", std::ios::binary);
-	long length = DRIVE_ARRAY.size();
-	for (int i = 33; i < DRIVE_ARRAY.size(); i++) {
-		std::string data = DRIVE_ARRAY.at(i).sector_data;
-//		std::cout << data << std::endl;
-//		std::cout << "=============================" << std::endl;
+	std::string log_filename = "TEST_" + file_name;
+	std::ofstream o_stream(log_filename.c_str(), std::ios::binary);
 
-		o_stream.write(DRIVE_ARRAY.at(i).sector_data, SECTOR_SIZE_IN_BYTES);
+	std::cout << "DATA LIST SIZE: " << data_list.size() << std::endl;
+
+	std::string data;
+	for (int i = 0; i < data_list.size(); i++) {
+		data.clear();
+		data = data_list.at(i).sector_data;
+		std::cout << data << std::endl;
+		//		std::cout << "=============================" << std::endl;
+
+		o_stream.write(data.c_str(), data.length());
 	}
+
+	std::cout << "BLAH: " << data_list.size() << std::endl;
 
 	o_stream.flush();
 	o_stream.close();

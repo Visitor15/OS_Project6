@@ -6,7 +6,7 @@ all: $(objects)
 directory_table.o : directory_table.cpp directory_table.h global_vars.h
 	g++ -c -g directory_table.cpp
 
-file_alloc_table.o : file_alloc_table.cpp file_alloc_table.h
+file_alloc_table.o : file_alloc_table.cpp file_alloc_table.h directory_table.h global_vars.h
 	g++ -c -g file_alloc_table.cpp
 
 disk_volume.o : disk_volume.cpp disk_volume.h file_alloc_table.h directory_table.h global_vars.h

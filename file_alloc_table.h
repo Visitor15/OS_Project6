@@ -8,6 +8,7 @@
 #ifndef FILE_ALLOC_TABLE_H_
 #define FILE_ALLOC_TABLE_H_
 
+#include <iostream>
 #include <vector>
 #include <string.h>
 
@@ -28,12 +29,16 @@ struct drive_sector_t {
 		// Do nothing
 	}
 
-	drive_sector_t(char data[]) {
-		memcpy(sector_data, data, SECTOR_SIZE_IN_BYTES);
+	drive_sector_t(char data[], long length) {
+		memset(sector_data, 0, SECTOR_SIZE_IN_BYTES);
+		memcpy(sector_data, data, length);
 	}
 
-	void copy_data(char data[]) {
-		memcpy(sector_data, data, SECTOR_SIZE_IN_BYTES);
+	void copy_data(char data[], long length) {
+		memset(sector_data, 0, SECTOR_SIZE_IN_BYTES);
+		memcpy(sector_data, data, length);
+
+		std::cout << "GOT DATA: " << sector_data << std::endl;
 	}
 };
 
@@ -43,8 +48,11 @@ struct __attribute__((packed)) fat_entry_t {
 
 	fat_entry_t() :
 			entry(FREE_SECTOR) {
+	};
+
+	void setEntry(int data) {
+		entry = data;
 	}
-	;
 };
 
 class file_alloc_table {
@@ -79,7 +87,7 @@ public:
 	/*
 	 *	FUNCTION
 	 */
-	fat_entry_t* request_specified_free_sectors(int count);
+	void request_specified_free_sectors(std::vector<fat_entry_t*> &entry_list, int count);
 
 	/*
 	 *	FUNCTION
