@@ -20,7 +20,7 @@ int main(void) {
 	disk_volume::get_instance()->copy_file_to_drive(TEST_FILENAME);
 	disk_volume::get_instance()->copy_file_to_drive(TEST_FILENAME_2);
 
-	disk_volume::get_instance()->print_file(TEST_FILENAME);
+//	disk_volume::get_instance()->print_file(TEST_FILENAME);
 //	disk_volume::get_instance()->print_file(TEST_FILENAME_2);
 
 //	std::vector<drive_sector_t> data_list =

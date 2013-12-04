@@ -49,7 +49,7 @@ void file_alloc_table::request_specified_free_sectors(
 		if (curr_count == count) {
 
 			// Last item of the vector.
-			entry_list.at(entry_list.size() - 1)->entry = head_index;
+			entry_list.at(entry_list.size() - 1)->setEntry(head_index);
 
 			std::cout << "ENTRY_LIST SIZE: " << entry_list.size() << std::endl;
 
@@ -57,18 +57,23 @@ void file_alloc_table::request_specified_free_sectors(
 		} else {
 			if (FILE_ALLOCATION_TABLE.at(i).entry == FREE_SECTOR) {
 
+				std::cout << "Adding index: " << i << std::endl;
+
 				entry_list.push_back(&FILE_ALLOCATION_TABLE[i]);
 				if (curr_count == 0) {
 					head_index = i;
+				} else {
+					//				(*free_sectors[curr_count - 1]).entry = i;
+					int temp_val = i;
 
-					std::cout << "Set head to: " << head_index << std::endl;
+					entry_list.at(entry_list.size() - 2)->setEntry(i);
+					FILE_ALLOCATION_TABLE[entry_list.at(entry_list.size() - 1)->entry].setEntry(
+							i);
 
+					std::cout << "Set index: "
+												<< entry_list.at(entry_list.size() - 1)->entry
+												<< std::endl;
 				}
-				//				(*free_sectors[curr_count - 1]).entry = i;
-				int temp_val = i;
-
-				entry_list.at(entry_list.size() - 1)->setEntry(i);
-				FILE_ALLOCATION_TABLE[entry_list.at(entry_list.size() - 1)->entry].setEntry(i);
 
 				// Attempting to break loop early if possible.
 				curr_count++;

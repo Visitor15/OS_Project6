@@ -38,7 +38,7 @@ struct drive_sector_t {
 		memset(sector_data, 0, SECTOR_SIZE_IN_BYTES);
 		memcpy(sector_data, data, length);
 
-		std::cout << "GOT DATA: " << sector_data << std::endl;
+//		std::cout << "GOT DATA: " << sector_data << std::endl;
 	}
 };
 
