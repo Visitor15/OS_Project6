@@ -74,6 +74,10 @@ public:
 	std::vector<drive_sector_t> get_file_by_name (std::string file_name);
 	void print_file(std::string file_name);
 	void print_drive_contents();
+    std::string UsageDetails();
+    std::string DisplayMenu();
+    std::string FAT_Dump();
+    
 };
 
 static disk_volume* m_pInstance;

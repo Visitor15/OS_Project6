@@ -338,3 +338,139 @@ drive_sector_t* disk_volume::get_data_sector_at(long index) {
 	return &DRIVE_ARRAY[index];
 }
 
+std::string FAT_Dump()
+{
+    for(int i = 2; i < drive_sector_t; i++)
+    {
+        if((i%20)==0)
+        {
+            std::cout<< data_list[i]<< std::hex<< data_list[i]<< std::endl;
+        }else{
+            std::cout<< data_list[i] << std::hex<< data_list[i]<< "|"<< std::endl;
+        }
+    }
+}
+
+ std::string DisplayMenu()
+ {
+ std::cout<< "Menu:" <<std::endl;
+ std::cout<< "1) List directory" <<std::endl;
+ std::cout<< "2) Copy file to disk" <<std::endl;
+ std::cout<< "3) Delete file" <<std::endl;
+ std::cout<< "4) Rename a file" <<std::endl;
+ std::cout<< "5) Usage map" <<std::endl;
+ std::cout<< "6) Directory dump" <<std::endl;
+ std::cout<< "7) FAT dump" <<std::endl;
+ std::cout<< "8) FAT chain" <<std::endl;
+ std::cout<< "9) Sector Dump" <<std::endl;
+ std::cout<< " Enter 0 at anytime to exit program" <<std::endl;
+ std::cout<<"Enter a menu number above to be redirected to a specific entry "<<std::endl;
+ 
+ char selection;
+ bool check = false;
+ while(!check)
+ {
+ std::cin>>selection;
+ switch(selection)
+ {
+ case '1':
+ std::cout<< "List directory selected.\n";
+ //to enter respective code here
+ break;
+ case '2':
+ std::cout<< "Copy file to disk selected.\n";
+ //to enter respective code here
+ break;
+ case '3':
+ std::cout<< "Delete file selected.\n";
+ //to enter respective code here
+ break;
+ case '4':
+ std::cout<< "Rename a file selected.\n";
+ //to enter respective code here
+ break;
+ case '5':
+ std::cout<< "Usage map selected.\n";
+ std::cout<< UsageDetails() <<std::endl;
+ break;
+ case '6':
+ std::cout<< "Directory dump selected.\n";
+ //to enter respective code here
+ break;
+ case '7':
+ std::cout<< "FAT dump selected.\n";
+ //to enter respective code here
+ break;
+ case '8':
+ std::cout<< "FAT chain selected.\n";
+ //to enter respective code here
+ break;
+ case '9':
+ std::cout<< "Sector Dump selected.\n";
+ //to enter respective code here
+ break;
+ default:
+ std::cout<<"You have selected an invalid entry. Please try again"<<std::endl;
+ break;
+ }
+ }
+ return 0;
+ }
+
+ std::string UsageDetails()
+ {
+ 
+ std::string val;
+ std::string tmp;
+ std::stringstream _stream;
+ std::cout<< "\n================================================================================"
+ << std::endl;
+ std::cout<< "Usage map" << std::endl;
+ std::cout<< "\n================================================================================"
+ << std::endl;
+ 
+ val += "CAPACITY:\t\t ";
+ _stream << _init_volume();
+ _stream >> tmp;
+ val.append(tmp);
+ 
+ //I just can't see where the file has been used. Is it at that part where it is being read and some other values?
+ 
+ val.append("USED:\t\t ")
+ _stream.clear();
+ _stream <<
+ tmp.clear;
+ _stream >> tmp;
+ val.append(tmp);
+ 
+ val.append("FREE:\t\t ");
+ _stream.clear();
+ _stream >> tmp;
+ val.append(tmp);
+ 
+ val.append("\n\n");
+ 
+ val.append("SECTORS:\t\t ");
+ _stream.clear();
+ _stream <<
+ tmp.clear();
+ _stream >> tmp;
+ val.append(tmp);
+ 
+ val.append("USED:\t\t ");
+ _stream.clear();
+ _stream << ;
+ tmp.clear();
+ _stream >> tmp;
+ val.append(tmp);
+ 
+ val.append("Free:\t\t ");
+ _stream.clear();
+ _stream << ;
+ tmp.clear();
+ _stream >> tmp;
+ val.append(tmp);
+ 
+ }
+
+
