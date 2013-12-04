@@ -98,11 +98,11 @@ fat_entry_t* file_alloc_table::get_sector_at(long index) {
 void file_alloc_table::get_sectors_for_file(uint16_t starting_cluster,
 		int num_sectors, std::vector<fat_entry_t> &entry_list) {
 
-	entry_list[0] = FILE_ALLOCATION_TABLE[starting_cluster];
+//	entry_list[0] = FILE_ALLOCATION_TABLE[starting_cluster];
 
 	std::cout << "Starting index: " << entry_list.size() << std::endl;
 
-	for (int i = 0; i < num_sectors; i++) {
+	for (int i = 1; i < num_sectors; i++) {
 		std::cout << "HIT HIT HIT HIT HIT " << i << std::endl;
 		entry_list.push_back(FILE_ALLOCATION_TABLE[entry_list[i].entry]);
 		std::cout << " ADDED ENTRY: " << entry_list.at(i).entry << std::endl;

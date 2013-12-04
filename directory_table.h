@@ -8,8 +8,13 @@
 #ifndef DIRECTORY_TABLE_H_
 #define DIRECTORY_TABLE_H_
 
-#include <stdint.h>
 #include <vector>
+#include <string.h>
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <fstream>
 #include "global_vars.h"
 
 /*
@@ -29,6 +34,21 @@ struct directory_entry_t {
 	unsigned short last_modified_date;
 	uint16_t starting_cluster;
 	unsigned long size;
+
+	directory_entry_t() {
+		memset(name, ' ', 8);
+		memset(extension, ' ', 3);
+		reserved = 0;
+		creation_time = 0;
+		creation_date = 0;
+		last_access_date = 0;
+		reserved_2 = 0;
+		last_modified_time = 0;
+		last_modified_date = 0;
+		starting_cluster = -1;
+		size = 0;
+		attrs = 0;
+	}
 };
 
 /*

@@ -7,8 +7,6 @@
 
 #include "disk_volume.h"
 
-#include <string>
-
 disk_volume::disk_volume() {
 	init_volume();
 }
@@ -147,7 +145,7 @@ void disk_volume::write_primary_fat(std::vector<fat_entry_t> alloc_table) {
 	o_stream.close();
 }
 
-void disk_volume::copy_file_to_drive(std::string file_name) {
+void disk_volume::copy_file_to_drive(std::string file_name, directory_entry_t dir_entry) {
 	std::ifstream i_stream(file_name.c_str(), std::ios::in | std::ios::binary);
 	unsigned int head_sector = -1;
 	if (i_stream.is_open()) {
@@ -192,6 +190,8 @@ void disk_volume::copy_file_to_drive(std::string file_name) {
 
 // Ensuring we have something to write.
 					if (i_stream.gcount() > 0) {
+						std::cout << "Writing to sector: " << curr_index
+								<< std::endl;
 						get_data_sector_at(curr_index)->copy_data(buffer,
 								i_stream.gcount());
 					}
@@ -203,13 +203,13 @@ void disk_volume::copy_file_to_drive(std::string file_name) {
 			i_stream.close();
 		}
 		// We make the directory entry last.
-		DIR_TABLE.create_entry(create_dir_entry(file_name, head_sector));
+		create_dir_entry(file_name, dir_entry, head_sector);
+		DIR_TABLE.create_entry(dir_entry);
 	}
 }
 
-directory_entry_t disk_volume::create_dir_entry(std::string file_name,
-		long head_sector) {
-	directory_entry_t dir_entry;
+void disk_volume::create_dir_entry(std::string file_name,
+		directory_entry_t& dir_entry, long head_sector) {
 	time_t curr_time = get_current_time();
 	std::ifstream i_stream(file_name.c_str(), std::ios::in | std::ios::binary);
 	i_stream.seekg(0, i_stream.beg);
@@ -221,17 +221,28 @@ directory_entry_t disk_volume::create_dir_entry(std::string file_name,
 	std::string title = file_name.substr(0, pos);
 	std::string extension = file_name.substr(pos + 1);
 
+	int i = 0;
+	for (i = 0; i < file_name.size() - 4; i++) {
+		dir_entry.name[i] = file_name[i];
+	}
+	dir_entry.name[7] = '\0';
+
+	int tmp_index = 0;
+	for (i = file_name.size() - 3; i <= file_name.size(); i++) {
+		dir_entry.extension[tmp_index] = file_name[i];
+		tmp_index++;
+	}
+
 	dir_entry.starting_cluster = head_sector;
 
-	std::cout << "Head sector set to: " << dir_entry.starting_cluster
-			<< std::endl;
-
-	memcpy(dir_entry.name, title.c_str(), 8);
-	memcpy(dir_entry.extension, extension.c_str(), 4);
-
+	std::cout << "Head sector set to: " << extension.size() << std::endl;
 	i_stream.close();
+//	memcpy(&dir_entry.name, title.c_str(), 8);
+//	memcpy(&dir_entry.extension, extension.c_str(), extension.size());
 
-	return dir_entry;
+	std::cout << "Added directory entry: " << dir_entry.name << " AND "
+			<< dir_entry.extension << std::endl;
+
 }
 
 std::vector<drive_sector_t> disk_volume::get_file_by_name(
@@ -255,11 +266,13 @@ std::vector<drive_sector_t> disk_volume::get_file_by_name(
 		std::cout << "STARTING SECTOR: " << dir_entry->starting_cluster
 				<< std::endl;
 
-		file_sectors.push_back((DRIVE_ARRAY[dir_entry->starting_cluster]));
+//		file_sectors.push_back((DRIVE_ARRAY[dir_entry->starting_cluster]));
 
-		std::cout << "Found starting sector: " << fat_entry_list.size()
+		std::cout << "Found starting sector: " << fat_entry_list.at(0).entry
 				<< std::endl;
-		for (int i = 0; i < num_sectors; i++) {
+
+		file_sectors.push_back(DRIVE_ARRAY[dir_entry->starting_cluster]);
+		for (int i = 0; i < num_sectors - 1; i++) {
 			std::cout << "HIT WITH ENTRY: " << fat_entry_list.at(i).entry
 					<< std::endl;
 
@@ -294,6 +307,7 @@ void disk_volume::print_drive_contents() {
 }
 
 void disk_volume::print_file(std::string file_name) {
+
 	std::vector<drive_sector_t> data_list = get_file_by_name(file_name);
 
 	std::cout << "==========================================" << std::endl;
@@ -306,13 +320,12 @@ void disk_volume::print_file(std::string file_name) {
 	std::cout << "DATA LIST SIZE: " << data_list.size() << std::endl;
 
 	std::string data;
-	for (int i = 0; i < data_list.size(); i++) {
-		data.clear();
+	for (int i = 0; i < data_list.size() - 1; i++) {
 		data = data_list.at(i).sector_data;
-//		std::cout << data << std::endl;
+		std::cout << data_list.at(i).sector_data << std::endl;
 		//		std::cout << "=============================" << std::endl;
 
-		o_stream.write(data.c_str(), data.length());
+		o_stream.write(data_list.at(i).sector_data, data.length());
 	}
 
 	std::cout << "BLAH: " << data_list.size() << std::endl;

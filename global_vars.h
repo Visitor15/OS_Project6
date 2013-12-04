@@ -17,6 +17,7 @@ static std::string BOOT_RECORD_FILENAME = "boot.bin";
 
 static std::string TEST_FILENAME = "WHALE.TXT";
 static std::string TEST_FILENAME_2 = "EMILY.TXT";
+static std::string TEST_FILENAME_3 = "GETTYSBU.TXT";
 
 static int DATA_SEG_OFFSET = 33;
 

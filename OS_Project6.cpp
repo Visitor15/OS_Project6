@@ -17,11 +17,17 @@ int main(void) {
 
 	disk_volume::get_instance();
 
-	disk_volume::get_instance()->copy_file_to_drive(TEST_FILENAME);
-	disk_volume::get_instance()->copy_file_to_drive(TEST_FILENAME_2);
+	directory_entry_t dir_entry;
+	disk_volume::get_instance()->copy_file_to_drive(TEST_FILENAME_3, dir_entry);
+	disk_volume::get_instance()->copy_file_to_drive(TEST_FILENAME_2, dir_entry);
+
+
+
+
 
 //	disk_volume::get_instance()->print_file(TEST_FILENAME);
-//	disk_volume::get_instance()->print_file(TEST_FILENAME_2);
+	disk_volume::get_instance()->print_file(TEST_FILENAME_2);
+	disk_volume::get_instance()->print_file(TEST_FILENAME_3);
 
 //	std::vector<drive_sector_t> data_list =
 //			disk_volume::get_instance()->get_file_by_name(TEST_FILENAME_2);

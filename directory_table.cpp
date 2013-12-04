@@ -22,10 +22,13 @@ directory_entry_t* directory_table::get_entry_by_name(
 		const std::string file_name) {
 	for (int i = 0; i < DIRECTORY.size(); i++) {
 		std::string entry_name(DIRECTORY.at(i).name);
-		entry_name.append(".").append(DIRECTORY.at(i).extension);
-		if (entry_name.find(file_name) != std::string::npos) {
+		std::cout << "Looking for entry: " << entry_name << " AND "
+				<< DIRECTORY.at(i).extension << std::endl;
+		if (entry_name.find(file_name.substr(0, file_name.find(".") - 1)) != std::string::npos
+				&& file_name.find(DIRECTORY.at(i).extension)
+						!= std::string::npos) {
 
-
+			std::cout << "FOUND!" << std::endl;
 
 			return &DIRECTORY[i];
 		}
@@ -38,7 +41,8 @@ bool directory_table::create_entry(directory_entry_t dir_entry) {
 
 	DIRECTORY.push_back(dir_entry);
 
-	std::cout << "Added directory entry with head index: "
+	std::cout << "Added directory entry: " << dir_entry.name
+			<< " with head index: "
 			<< DIRECTORY.at(DIRECTORY.size() - 1).starting_cluster << std::endl;
 
 	return false;
